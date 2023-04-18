@@ -23,7 +23,12 @@ func get_tag(s string, i int, j int) Tag {
 		for i := 1; i < len(parts); i++ {
 			att := strings.Split(parts[i], "=")
 			if len(att) > 1 {
-				attrs[att[0]] = att[1]
+				val := att[1]
+				ll := len(val)
+				if val[0:1] == "\"" && val[ll-1:ll] == "\"" {
+					val = val[1 : ll-1]
+				}
+				attrs[att[0]] = val
 			}
 		}
 		tag.attrs = attrs
@@ -49,7 +54,7 @@ func Load(s string) []Tag {
 	}
 	return tags
 }
-func GetDivById(s string, id string) string {
+func GetDivById(s string, Id string) string {
 	tags := Load(s)
 	count := 0
 	started := false
@@ -58,7 +63,7 @@ func GetDivById(s string, id string) string {
 		if started {
 			if tags[i].closing {
 				count--
-			} else {
+			} else if tags[i].elem != "br" {
 				count++
 			}
 			if count == 0 {
@@ -67,7 +72,7 @@ func GetDivById(s string, id string) string {
 		} else {
 			val, ok := tags[i].attrs["id"]
 			if ok {
-				if val == id {
+				if val == Id {
 					started = true
 					start_index = i
 					count++
