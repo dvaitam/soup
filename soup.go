@@ -11,7 +11,9 @@ type Tag struct {
 	closing bool
 }
 
-func get_tag(s string, i int, j int) Tag {
+var single_elements = map[string]bool{"br": true, "link": true}
+
+func GetTag(s string, i int, j int) Tag {
 	if s[i+1] == '/' {
 		return Tag{i: i, j: j, elem: s[i+2 : j], closing: true}
 	} else {
@@ -45,7 +47,7 @@ func Load(s string) []Tag {
 	for i := 0; i < len(s); i++ {
 		if started {
 			if s[i] == '>' {
-				tags = append(tags, get_tag(s, start_index, i))
+				tags = append(tags, GetTag(s, start_index, i))
 				started = false
 			}
 		} else {
@@ -57,32 +59,95 @@ func Load(s string) []Tag {
 	}
 	return tags
 }
-func GetDivById(s string, Id string) string {
+func GetTagsByClassOrId(s string, IdOrClass string, Id bool) [][]Tag {
 	tags := Load(s)
 	count := 0
 	started := false
 	start_index := 0
+	all_tags := make([][]Tag, 0)
 	for i := 0; i < len(tags); i++ {
 		if started {
 			if tags[i].closing {
 				count--
-			} else if tags[i].elem != "br" {
+			} else if !single_elements[tags[i].elem] {
 				count++
 			}
 			if count == 0 {
-				return s[tags[start_index].i : tags[i].j+1]
+				all_tags = append(all_tags, tags[start_index:i+1])
+				started = false
 			}
 		} else {
-			val, ok := tags[i].attrs["id"]
+			val, ok := tags[i].attrs[IdOrClass]
 			if ok {
-				if val == Id {
-					started = true
-					start_index = i
-					count++
+				if Id {
+					if val == IdOrClass {
+						started = true
+						start_index = i
+						count++
+					}
+				} else {
+					classes := strings.Fields(val)
+					found := false
+					for _, class := range classes {
+						if class == IdOrClass {
+							found = true
+							break
+						}
+					}
+					if found {
+						started = true
+						start_index = i
+						count++
+					}
 				}
 			}
 		}
-
 	}
-	return ""
+	return all_tags
+}
+func GetTagsById(s string, Id string) []Tag {
+	all_tags := GetTagsByClassOrId(s, Id, true)
+	if len(all_tags) > 0 {
+		return all_tags[0]
+	}
+	return nil
+}
+func GetDivById(s string, Id string) string {
+	tags := GetTagsById(s, Id)
+	if len(tags) == 0 {
+		return ""
+	}
+	n := len(tags)
+	return s[tags[0].i : tags[n-1].j+1]
+}
+func GetHtmlById(s string, Id string) string {
+	tags := GetTagsById(s, Id)
+	if len(tags) == 0 {
+		return ""
+	}
+	n := len(tags)
+	return s[tags[0].i : tags[n-1].j+1]
+}
+func GetTextFromTags(s string, tags []Tag) string {
+	if len(tags) <= 1 {
+		return ""
+	}
+	var sb strings.Builder
+	for i := 1; i <= len(tags); i++ {
+		curr, prev := tags[i], tags[i-1]
+		sb.WriteString(s[prev.j+1 : curr.i])
+	}
+	return sb.String()
+}
+func GetTextById(s string, Id string) string {
+	tags := GetTagsById(s, Id)
+	return GetTextFromTags(s, tags)
+}
+func GetTextsFromClass(s string, Class string) []string {
+	all_tags := GetTagsByClassOrId(s, Class, false)
+	texts := make([]string, 0)
+	for i := 0; i < len(all_tags); i++ {
+		texts = append(texts, GetTextFromTags(s, all_tags[i]))
+	}
+	return texts
 }
