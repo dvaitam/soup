@@ -30,7 +30,7 @@ func get_tag(s string, i int, j int) Tag {
 		return tag
 	}
 }
-func load(s string) []Tag {
+func Load(s string) []Tag {
 	tags := make([]Tag, 0)
 	started := false
 	start_index := 0
