@@ -65,11 +65,12 @@ func GetTagsByClassOrId(s string, IdOrClass string, Id bool) [][]Tag {
 	started := false
 	start_index := 0
 	all_tags := make([][]Tag, 0)
+
 	for i := 0; i < len(tags); i++ {
 		if started {
 			if tags[i].closing {
 				count--
-			} else if !single_elements[tags[i].elem] {
+			} else if tags[i].elem != "br" {
 				count++
 			}
 			if count == 0 {
@@ -77,15 +78,19 @@ func GetTagsByClassOrId(s string, IdOrClass string, Id bool) [][]Tag {
 				started = false
 			}
 		} else {
-			val, ok := tags[i].attrs[IdOrClass]
-			if ok {
-				if Id {
+			if Id {
+				val, ok := tags[i].attrs["id"]
+				if ok {
 					if val == IdOrClass {
 						started = true
 						start_index = i
 						count++
 					}
-				} else {
+				}
+
+			} else {
+				val, ok := tags[i].attrs["class"]
+				if ok {
 					classes := strings.Fields(val)
 					found := false
 					for _, class := range classes {
@@ -101,6 +106,7 @@ func GetTagsByClassOrId(s string, IdOrClass string, Id bool) [][]Tag {
 					}
 				}
 			}
+
 		}
 	}
 	return all_tags
@@ -133,11 +139,11 @@ func GetTextFromTags(s string, tags []Tag) string {
 		return ""
 	}
 	var sb strings.Builder
-	for i := 1; i <= len(tags); i++ {
+	for i := 1; i < len(tags); i++ {
 		curr, prev := tags[i], tags[i-1]
 		sb.WriteString(s[prev.j+1 : curr.i])
 	}
-	return sb.String()
+	return strings.TrimSpace(sb.String())
 }
 func GetTextById(s string, Id string) string {
 	tags := GetTagsById(s, Id)
