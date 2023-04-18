@@ -49,3 +49,32 @@ func Load(s string) []Tag {
 	}
 	return tags
 }
+func GetDivById(s string, id string) string {
+	tags := Load(s)
+	count := 0
+	started := false
+	start_index := 0
+	for i := 0; i < len(tags); i++ {
+		if started {
+			if tags[i].closing {
+				count--
+			} else {
+				count++
+			}
+			if count == 0 {
+				return s[tags[start_index].i : tags[i].j+1]
+			}
+		} else {
+			val, ok := tags[i].attrs["id"]
+			if ok {
+				if val == id {
+					started = true
+					start_index = i
+					count++
+				}
+			}
+		}
+
+	}
+	return ""
+}
