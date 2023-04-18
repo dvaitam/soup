@@ -19,7 +19,6 @@ func main() {
 	//fmt.Println(b) // print the content as 'bytes'
 
 	s := string(b) // convert content to a 'string'
+	//tags := soup.load(s)
 	fmt.Println(s)
-	tags := soup.load(s)
-	fmt.Println(tags)
 }
