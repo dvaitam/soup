@@ -23,6 +23,9 @@ func get_tag(s string, i int, j int) Tag {
 		for i := 1; i < len(parts); i++ {
 			att := strings.Split(parts[i], "=")
 			if len(att) > 1 {
+				if len(att[1]) == 0 {
+					continue
+				}
 				val := att[1]
 				ll := len(val)
 				if val[0:1] == "\"" && val[ll-1:ll] == "\"" {
