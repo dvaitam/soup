@@ -11,7 +11,7 @@ type Tag struct {
 	closing bool
 }
 
-var single_elements = map[string]bool{"br": true, "link": true}
+var single_elements = map[string]bool{"br": true, "link": true, "img": true}
 
 func GetTag(s string, i int, j int) Tag {
 	if s[i+1] == '/' {
@@ -70,7 +70,7 @@ func GetTagsByClassOrId(s string, IdOrClass string, Id bool) [][]Tag {
 		if started {
 			if tags[i].closing {
 				count--
-			} else if tags[i].elem != "br" {
+			} else if !single_elements[tags[i].elem] {
 				count++
 			}
 			if count == 0 {
