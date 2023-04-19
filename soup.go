@@ -30,7 +30,7 @@ func GetTag(s string, i int, j int) Tag {
 				}
 				val := att[1]
 				ll := len(val)
-				if val[0:1] == "\"" && val[ll-1:ll] == "\"" {
+				if val[0:1] == "\"" && val[ll-1:ll] == "\"" || val[0:1] == "'" && val[ll-1:ll] == "'" {
 					val = val[1 : ll-1]
 				}
 				attrs[att[0]] = val
