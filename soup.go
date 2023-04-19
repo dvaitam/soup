@@ -157,3 +157,6 @@ func GetTextsFromClass(s string, Class string) []string {
 	}
 	return texts
 }
+func GetTagAttr(tag Tag, field string) string {
+	return tag.attrs[field]
+}
