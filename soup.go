@@ -128,6 +128,9 @@ func GetDivById(s string, Id string) string {
 }
 func GetHtmlById(s string, Id string) string {
 	tags := GetTagsById(s, Id)
+	return GetHtmlFromTags(s, tags)
+}
+func GetHtmlFromTags(s string, tags []Tag) string {
 	if len(tags) == 0 {
 		return ""
 	}
