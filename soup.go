@@ -33,6 +33,9 @@ func GetTag(s string, i int, j int) Tag {
 			index := strings.Index(parts[i], "=")
 			if index != -1 {
 				val := parts[i][index+1:]
+				if len(val) < 2 {
+					continue
+				}
 				ll := len(val)
 				if val[0:1] == "\"" && val[ll-1:ll] == "\"" || val[0:1] == "'" && val[ll-1:ll] == "'" {
 					val = val[1 : ll-1]
