@@ -131,6 +131,8 @@ func GetTagsById(s string, Id string) []Tag {
 	}
 	return nil
 }
+
+// Change version
 func GetTextsByElement(s string, Element string) []string {
 	all_tags := GetTags(s, Element, ELEMENT)
 	texts := make([]string, 0)
