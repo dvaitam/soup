@@ -131,13 +131,21 @@ func GetTagsById(s string, Id string) []Tag {
 	}
 	return nil
 }
-
-// Change version
 func GetTextsByElement(s string, Element string) []string {
 	all_tags := GetTags(s, Element, ELEMENT)
 	texts := make([]string, 0)
 	for i := 0; i < len(all_tags); i++ {
 		texts = append(texts, GetTextFromTags(s, all_tags[i]))
+	}
+	return texts
+}
+func GetElementAttrs(s string, Element string, Attr string) []string {
+	all_tags := GetTags(s, Element, ELEMENT)
+	texts := make([]string, 0)
+	for i := 0; i < len(all_tags); i++ {
+		if len(all_tags[i]) > 0 {
+			texts = append(texts, GetTagAttr(all_tags[i][0], Attr))
+		}
 	}
 	return texts
 }
