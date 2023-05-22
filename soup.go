@@ -30,17 +30,14 @@ func GetTag(s string, i int, j int) Tag {
 		attrs := map[string]string{}
 
 		for i := 1; i < len(parts); i++ {
-			att := strings.Split(parts[i], "=")
-			if len(att) > 1 {
-				if len(att[1]) == 0 {
-					continue
-				}
-				val := att[1]
+			index := strings.Index(parts[i], "=")
+			if index != -1 {
+				val := parts[i][index+1:]
 				ll := len(val)
 				if val[0:1] == "\"" && val[ll-1:ll] == "\"" || val[0:1] == "'" && val[ll-1:ll] == "'" {
 					val = val[1 : ll-1]
 				}
-				attrs[att[0]] = val
+				attrs[parts[i][:index]] = val
 			}
 		}
 		tag.attrs = attrs
