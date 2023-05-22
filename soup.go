@@ -10,6 +10,13 @@ type Tag struct {
 	attrs   map[string]string
 	closing bool
 }
+type ExtractType int
+
+const (
+	ID      ExtractType = iota // c0 == 0
+	CLASS   ExtractType = iota // c1 == 1
+	ELEMENT ExtractType = iota // c2 == 2
+)
 
 var single_elements = map[string]bool{"br": true, "link": true, "img": true}
 
@@ -59,7 +66,7 @@ func Load(s string) []Tag {
 	}
 	return tags
 }
-func GetTagsByClassOrId(s string, IdOrClass string, Id bool) [][]Tag {
+func GetTags(s string, Extract string, Etype ExtractType) [][]Tag {
 	tags := Load(s)
 	count := 0
 	started := false
@@ -78,23 +85,23 @@ func GetTagsByClassOrId(s string, IdOrClass string, Id bool) [][]Tag {
 				started = false
 			}
 		} else {
-			if Id {
+			if Etype == ID {
 				val, ok := tags[i].attrs["id"]
 				if ok {
-					if val == IdOrClass {
+					if val == Extract {
 						started = true
 						start_index = i
 						count++
 					}
 				}
 
-			} else {
+			} else if Etype == CLASS {
 				val, ok := tags[i].attrs["class"]
 				if ok {
 					classes := strings.Fields(val)
 					found := false
 					for _, class := range classes {
-						if class == IdOrClass {
+						if class == Extract {
 							found = true
 							break
 						}
@@ -105,6 +112,12 @@ func GetTagsByClassOrId(s string, IdOrClass string, Id bool) [][]Tag {
 						count++
 					}
 				}
+			} else if Etype == ELEMENT {
+				if tags[i].elem == Extract {
+					started = true
+					start_index = i
+					count++
+				}
 			}
 
 		}
@@ -112,11 +125,19 @@ func GetTagsByClassOrId(s string, IdOrClass string, Id bool) [][]Tag {
 	return all_tags
 }
 func GetTagsById(s string, Id string) []Tag {
-	all_tags := GetTagsByClassOrId(s, Id, true)
+	all_tags := GetTags(s, Id, ID)
 	if len(all_tags) > 0 {
 		return all_tags[0]
 	}
 	return nil
+}
+func GetTextsByElement(s string, Element string) []string {
+	all_tags := GetTags(s, Element, ELEMENT)
+	texts := make([]string, 0)
+	for i := 0; i < len(all_tags); i++ {
+		texts = append(texts, GetTextFromTags(s, all_tags[i]))
+	}
+	return texts
 }
 func GetDivById(s string, Id string) string {
 	tags := GetTagsById(s, Id)
@@ -153,7 +174,7 @@ func GetTextById(s string, Id string) string {
 	return GetTextFromTags(s, tags)
 }
 func GetTextsFromClass(s string, Class string) []string {
-	all_tags := GetTagsByClassOrId(s, Class, false)
+	all_tags := GetTags(s, Class, CLASS)
 	texts := make([]string, 0)
 	for i := 0; i < len(all_tags); i++ {
 		texts = append(texts, GetTextFromTags(s, all_tags[i]))
