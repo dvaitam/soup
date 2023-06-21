@@ -1,3 +1,3 @@
-module github.com/amanchik/soup
+module github.com/dvaitam/soup
 
 go 1.20
